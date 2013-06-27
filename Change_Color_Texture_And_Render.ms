@@ -509,14 +509,18 @@ on btnRender pressed do (
 				try (makeDir (outFolder + "\\" + getFilenameFile colPath[l] ) all:false
 					outF = (outFolder + "\\" + getFilenameFile colPath[l] + "\\" + getFilenameFile colPath[l])
 					) catch (
-						makeDir (outFolder + "\\" + colPath[l] as string ) all:false
-						outF = (outFolder + "\\" + colPath[l] as string + "\\" + colPath[l] as string)
+						colStr1 = filterstring (colPath[l] as string) " ()"
+						colStr2 = colStr1[1]+"-"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
+						makeDir (outFolder + "\\" + colStr2 ) all:false
+						outF = (outFolder + "\\" + colStr2 as string + "\\" + colStr2)
 						)
 				) else (
 					try (
 					outF = (outFolder + "\\" + getFilenameFile colPath[l])
 					) catch (
-						outF = (outFolder + "\\" + colPath[l] as string)
+						colStr1 = filterstring (colPath[l] as string) " ()"
+						colStr2 = colStr1[1]+"-"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
+						outF = (outFolder + "\\" + colStr2)
 						)						
 					)
 			-- render
