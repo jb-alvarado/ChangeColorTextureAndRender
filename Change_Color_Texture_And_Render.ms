@@ -525,8 +525,8 @@ on btnRender pressed do (
 					)
 			-- render
 			renderSceneDialog.close()
-			re = maxOps.GetCurRenderElementMgr()
-			for r = 0 to re.numrenderelements() do re.SetRenderElementFilename r ""
+			local re = maxOps.GetCurRenderElementMgr()
+			for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
 			rendShowVFB = on
 			rendSaveFile = on
 			rendSaveFile = on
@@ -554,8 +554,14 @@ on btnRender pressed do (
 						)
 				)
 
-			if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do return false
+			if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do (
+				for r = 0 to re.numrenderelements() do re.SetRenderElementFilename r ""
+				rendOutputFilename = ""
+				renderSceneDialog.commit()
+				return false
+				)
 			)
+			for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
 			rendOutputFilename = ""
 			renderSceneDialog.commit()
 		) else (
