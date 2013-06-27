@@ -544,7 +544,7 @@ on btnRender pressed do (
 						)
 					4: (
 						num1 = filterstring rendPickupFrames ",- "
-						num2 = "000" + bb[bb.count]
+						num2 = "000" + num1[num1.count]
 						num3 = subString num2 (num2.count - 3) 4
 						)
 				)
