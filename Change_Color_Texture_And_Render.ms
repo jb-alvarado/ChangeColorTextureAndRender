@@ -34,7 +34,7 @@
 
 ----------------------------------------------------------------------------------------------------------------------
 --
---  Script Name: Change Color  Texture And Render
+--  Script Name: Change Color Texture And Render
 --
 --	Author:   Jonathan Baecker (jb_alvardo), www.pixelcrusher.de | blog.pixelcrusher.de
 --
@@ -334,7 +334,7 @@ rollout ChangeColorTextureAndRender "Change Color Texture And Render" width:400 
 		)
 
 -----------------------------------------------
---Progress, fill material and texture array
+--Progress, fill color and texture array
 -----------------------------------------------
 	fn doMaterialList materials = (
 		--reset material and texture array
@@ -527,37 +527,32 @@ on btnRender pressed do (
 			rendSaveFile = on
 			rendOutputFilename = (outF + "_" + ddlType.items[ddlType.selection])
 			renderSceneDialog.commit()
-			--renderSceneDialog.open()
 			max quick render
-			
-			callbacks.removescripts id:#cancel_render_check
-  
-			fn getNumberRenderFrames = (
+
+			local num3=""
 				case rendTimeType of (
-					1: 1
-					2: (animationrange.end - animationrange.start + 1)/rendNThFrame
-					3: (rendEnd - rendStart + 1)/rendNThFrame
+					1: num3 = ""
+					2: (
+						num1 = l - 1 + animationRange.start + rendFileNumberBase
+						num2 = "000" + num1 as string 
+						num3 = subString num2 (num2.count - 3) 4
+						)
+					3: (
+						num1 = l - 1 + rendStart + rendFileNumberBase 
+						num2 = "000" + num1 as string 
+						num3 = subString num2 (num2.count - 3) 4
+						)
 					4: (
-						ff = filterstring rendPickupFrames ","
-						num = 0
-						for f in ff do if (f as integer != undefined) then num += 1 else (
-							vv = filterstring f "- "
-							num += vv[vv.count] as integer - vv[1] as integer + 1
-							)
-						num
-					 )
+						num1 = filterstring rendPickupFrames ",- "
+						num2 = "000" + bb[bb.count]
+						num3 = subString num2 (num2.count - 3) 4
+						)
 				)
+
+			if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do return false
 			)
-			 
-			global TotalFrames
-			global RenderedFrames
-			  
-			callbacks.addscript #preRender "TotalFrames = getNumberRenderFrames(); RenderedFrames = 0" id:#cancel_render_check
-			callbacks.addscript #postRenderFrame "RenderedFrames += 1;" id:#cancel_render_check
-			callbacks.addscript #postRender "(RenderedFrames < TotalFrames)" id:#cancel_render_check
-			  
-			if (RenderedFrames < TotalFrames) do return false 
-			)
+			rendOutputFilename = ""
+			renderSceneDialog.commit()
 		) else (
 			MessageBox "Please select a output folder!" title:ProgramName
 			)
