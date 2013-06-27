@@ -555,13 +555,13 @@ on btnRender pressed do (
 				)
 
 			if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do (
-				for r = 0 to re.numrenderelements() do re.SetRenderElementFilename r ""
+				for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
 				rendOutputFilename = ""
 				renderSceneDialog.commit()
 				return false
 				)
 			)
-			for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
+			for r3 = 0 to re.numrenderelements() do re.SetRenderElementFilename r3 ""
 			rendOutputFilename = ""
 			renderSceneDialog.commit()
 		) else (
