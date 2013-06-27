@@ -408,8 +408,14 @@ rollout ChangeColorTextureAndRender "Change Color Texture And Render" width:400 
 		
 	fn doColorList col = (
 		colListLi = #()
-
-		li=dotNetObject "System.Windows.Forms.ListViewItem" (col as string)
+		colLi = col
+		li=dotNetObject "System.Windows.Forms.ListViewItem" (colLi as string)
+		li.backColor=li.backColor.fromARGB colLi.r colLi.g colLi.b
+		if (colLi.r + colLi.g + colLi.b < 381) then (
+			li.ForeColor=li.ForeColor.fromARGB 255 255 255
+			) else (
+				li.ForeColor=li.ForeColor.fromARGB 0 0 0
+				)
 		append colListLi li
 		join colPath #(col)
 		
@@ -510,7 +516,7 @@ on btnRender pressed do (
 					outF = (outFolder + "\\" + getFilenameFile colPath[l] + "\\" + getFilenameFile colPath[l])
 					) catch (
 						colStr1 = filterstring (colPath[l] as string) " ()"
-						colStr2 = colStr1[1]+"-"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
+						colStr2 = colStr1[1]+"_"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
 						makeDir (outFolder + "\\" + colStr2 ) all:false
 						outF = (outFolder + "\\" + colStr2 as string + "\\" + colStr2)
 						)
@@ -519,7 +525,7 @@ on btnRender pressed do (
 					outF = (outFolder + "\\" + getFilenameFile colPath[l])
 					) catch (
 						colStr1 = filterstring (colPath[l] as string) " ()"
-						colStr2 = colStr1[1]+"-"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
+						colStr2 = colStr1[1]+"_"+colStr1[2]+"-"+colStr1[3]+"-"+colStr1[4]
 						outF = (outFolder + "\\" + colStr2)
 						)						
 					)
