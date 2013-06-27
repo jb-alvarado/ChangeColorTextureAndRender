@@ -259,7 +259,8 @@ rollout ChangeColorTextureAndRender "Change Color Texture And Render" width:400 
 		label texInfo "Path To Texture Folder:" pos:[20,250]
 		editText texPath "" pos:[16,270] width:300 readOnly:true
 		button btnChangeTex "Browse" pos:[320,270] width:60 height:18
-		colorPicker colP "Color:" pos:[20,295] width:100 height:18 color:(color 100 255 100)
+		colorPicker colP "Color:" pos:[20,295] width:100 height:18 color:(color 100 255 100) modal:false
+
 		button btnAddCol "Add Color" pos:[320,295] width:60 height:18
 		dotNetControl DotNBoxCT "system.windows.forms.listView" pos:[20,320] width:360 height:300
 
