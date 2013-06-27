@@ -408,10 +408,10 @@ rollout ChangeColorTextureAndRender "Change Color Texture And Render" width:400 
 		
 	fn doColorList col = (
 		colListLi = #()
-		colLi = col
-		li=dotNetObject "System.Windows.Forms.ListViewItem" (colLi as string)
-		li.backColor=li.backColor.fromARGB colLi.r colLi.g colLi.b
-		if (colLi.r + colLi.g + colLi.b < 381) then (
+	
+		li=dotNetObject "System.Windows.Forms.ListViewItem" (col as string)
+		li.backColor=li.backColor.fromARGB col.r col.g col.b
+		if (col.r + col.g + col.b < 381) then (
 			li.ForeColor=li.ForeColor.fromARGB 255 255 255
 			) else (
 				li.ForeColor=li.ForeColor.fromARGB 0 0 0
@@ -476,7 +476,7 @@ on btnRender pressed do (
 							MessageBox ("Warning: You have select a \"" + classof colMats[i] as string + "\" material, this will not process!") title:ProgramName
 							return false
 						) else (
-							case classof mtl of (
+							case classof colMats[i] of (
 								Arch___Design__mi: (
 									try (colMats[i].diff_color_map = Bitmaptexture fileName:colPath[l]
 										) catch (
