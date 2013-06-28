@@ -455,6 +455,7 @@ on btnOutput pressed do (
 
 on btnRender pressed do (
 	local countCheck = 0
+	local re = maxOps.GetCurRenderElementMgr()
 	if (outFolder != undefined) then (
 		
 		for c = 1 to DotNBoxMats.Items.count do (
@@ -531,7 +532,6 @@ on btnRender pressed do (
 					)
 			-- render
 			renderSceneDialog.close()
-			local re = maxOps.GetCurRenderElementMgr()
 			for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
 			rendShowVFB = on
 			rendSaveFile = on
