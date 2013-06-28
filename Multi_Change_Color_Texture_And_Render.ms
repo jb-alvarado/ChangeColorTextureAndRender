@@ -299,7 +299,7 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 		button btnChangeTex1 "Browse 1" pos:[320,270] width:60 height:18
 		colorPicker colP "Color 1:" pos:[20,295] width:100 height:18 color:(color 100 255 100) modal:false
 
-		button btnAddCol1 "Add Color 1" pos:[320,295] width:60 height:18
+		button btnAddCol1 "Add Color1" pos:[320,295] width:60 height:18
 		dotNetControl DotNBoxCT1 "system.windows.forms.listView" pos:[20,320] width:360 height:300
 		
 	groupBox grpColTex2 "Colors and Textures 2:" pos:[400,230] width:380 height:400
@@ -309,7 +309,7 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 		button btnChangeTex2 "Browse 2" pos:[710,270] width:60 height:18
 		colorPicker colP2 "Color 2:" pos:[410,295] width:100 height:18 color:(color 100 255 100) modal:false
 
-		button btnAddCol2 "Add Color 2" pos:[710,295] width:60 height:18
+		button btnAddCol2 "Add Color2" pos:[710,295] width:60 height:18
 		dotNetControl DotNBoxCT2 "system.windows.forms.listView" pos:[410,320] width:360 height:300	
 
 	groupBox grpRender "Render Output:" pos:[10,630] width:770 height:80
@@ -327,7 +327,7 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 		cb = ((colorman.getColor #background)*255+20) as color
 		cf = ((colorman.getColor #text)*255+30) as color
 		
-		DotNBoxMats1.columns.add "Material One List 1" 339
+		DotNBoxMats1.columns.add "Material List 1" 339
 		DotNBoxMats1.view=(dotNetClass "system.windows.forms.view").details
 		DotNBoxMats1.FullRowSelect=true
 		DotNBoxMats1.GridLines=false
@@ -385,7 +385,7 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 			texPath1.pos=[20, newSize[2]-450]
 			texPath1.width=newSize[1]/2-100
 			btnChangeTex1.pos=[newSize[1]/2-75, newSize[2]-450]
-			colP.pos=[53, newSize[2]-425]
+			colP.pos=[63, newSize[2]-425]
 			btnAddCol1.pos=[newSize[1]/2-75, newSize[2]-425]
 			DotNBoxCT1.width=newSize[1]/2-35
 			DotNBoxCT1.pos=[20, newSize[2]-400]
@@ -656,7 +656,7 @@ on btnRender pressed do (
 					) --if checked end
 				)
 			
-			--loop in material list 1	
+			--loop in material list 2
 			for ll = 1 to colPath2.count do (
 				for ii = 1 to DotNBoxMats2.Items.count do (
 					if (DotNBoxMats2.Items.Item[ii-1].Checked == true) do (
@@ -671,25 +671,20 @@ on btnRender pressed do (
 						) --if checked end
 					)
 					
+				try (outNameA = getFilenameFile colPath1[l]) catch (
+					outNameAT = filterstring (colPath1[l] as string) " ()"
+					outNameA = outNameAT[1]+"_"+outNameAT[2]+"-"+outNameAT[3]+"-"+outNameAT[4]
+					)
+				try (outNameB = getFilenameFile colPath2[ll]) catch (
+					outNameBT = filterstring (colPath2[ll] as string) " ()"
+					outNameB = outNameBT[1]+"_"+outNameBT[2]+"-"+outNameBT[3]+"-"+outNameBT[4]
+					)	
+
 				if (chkMakeF.checked == true) then (
-					try (makeDir (outFolder + "\\" + getFilenameFile colPath1[l] + "_-_" + getFilenameFile colPath2[ll]) all:false
-						outF = (outFolder + "\\" + getFilenameFile colPath1[l] + "_-_" + getFilenameFile colPath2[ll] + "\\" + getFilenameFile colPath1[l] + "_-_" + getFilenameFile colPath2[ll])
-						) catch (
-							colStr1a = filterstring (colPath1[l] as string) " ()"
-							colStr1b = filterstring (colPath2[ll] as string) " ()"
-							colStr2 = colStr1a[1]+"_"+colStr1a[2]+"-"+colStr1a[3]+"-"+colStr1a[4]+"_-_"+colStr1b[1]+"_"+colStr1b[2]+"-"+colStr1b[3]+"-"+colStr1b[4]
-							makeDir (outFolder + "\\" + colStr2 ) all:false
-							outF = (outFolder + "\\" + colStr2 as string + "\\" + colStr2)
-							)
+					makeDir (outFolder + "\\" + outNameA + "_-_" + outNameB) all:false
+					outF = (outFolder + "\\" + outNameA + "_-_" + outNameB + "\\" + outNameA + "_-_" + outNameB)
 					) else (
-						try (
-						outF = (outFolder + "\\" + getFilenameFile colPath1[l] + "_-_" + getFilenameFile colPath2[ll])
-						) catch (
-							colStr1a = filterstring (colPath1[l] as string) " ()"
-							colStr1b = filterstring (colPath2[ll] as string) " ()"
-							colStr2 = colStr1a[1]+"_"+colStr1a[2]+"-"+colStr1a[3]+"-"+colStr1a[4]+"_-_"+colStr1b[1]+"_"+colStr1b[2]+"-"+colStr1b[3]+"-"+colStr1b[4]
-							outF = (outFolder + "\\" + colStr2)
-							)						
+						outF = (outFolder + "\\" + outNameA + "_-_" + outNameB)						
 						)
 				-- render
 				renderSceneDialog.close()
@@ -728,8 +723,7 @@ on btnRender pressed do (
 					return false
 					)
 					
-				)--loop in material list 1 end
-				
+				) --loop in material list 1 end
 				
 			
 			)
