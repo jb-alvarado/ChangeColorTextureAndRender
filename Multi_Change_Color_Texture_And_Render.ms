@@ -241,6 +241,7 @@ global colMatsLi = #()
 		
 	) --fn matlists end	
 
+	--fn change colors or textures in material
 	fn processColTex prMat prTex = (	
 		case classof prMat of (
 			Arch___Design__mi: (
@@ -273,9 +274,29 @@ global colMatsLi = #()
 						prMat.Diffuse = prTex
 						)	
 				)
+			default: (
+				if (prMat != classof Architectural AND prMat != classof Car_Paint_Material__mi AND prMat != classof StandardMaterial AND prMat != classof Arch___Design__mi) do (
+					try (prMat.diffuseMap = Bitmaptexture fileName:prTex
+					) catch (
+						prMat.diffuseMap = undefined
+						prMat.Diffuse = prTex
+						)					
+					)				
+				)
 			)
 		)	
 
+	--fn render		
+	fn BRender re outF outType = (	
+		renderSceneDialog.close()
+		for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
+		rendShowVFB = on
+		rendSaveFile = on
+		rendOutputFilename = (outF + "_" + outType)
+		renderSceneDialog.commit()
+		max quick render
+		)	
+		
 rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render" width:790 height:720 (
 	
 	local ProgramName = "Multi Change Color Texture And Render"
@@ -316,6 +337,9 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 		editText RenderPath "" pos:[16,650] width:688 readOnly:true
 		button btnOutput "Output" pos:[710,650] width:60 height:18
 		checkBox chkMakeF "Create Sub Folders" pos:[20,678] checked:true
+		checkBox chkNetR "Net Render" pos:[140,678]
+		progressBar prgProgress1 "" pos:[230,680] width:160 height:12 color:[0,200,0]
+		progressBar prgProgress2 "" pos:[400,680] width:160 height:12 color:[0,200,0]
 		dropDownList ddlType "" pos:[645,678] width:60 items:#(".bmp", ".cin", ".exr", ".pic", ".jpg", ".jpe", ".jpeg", ".png", ".rgb", ".rgba", ".sgi", ".int", ".rla", ".rpf", ".tga", ".tif") selection:8
 		button btnRender "Render" pos:[710,675] width:60 height:24
 
@@ -412,6 +436,9 @@ rollout MultiChangeColorTextureAndRender "Multi Change Color Texture And Render"
 			RenderPath.width=newSize[1]-104
 			btnOutput.pos=[newSize[1]-80, newSize[2]-70]
 			chkMakeF.pos=[20, newSize[2]-42]
+			chkNetR.pos=[140, newSize[2]-42]
+			prgProgress1.pos=[230, newSize[2]-40]
+			prgProgress2.pos=[400, newSize[2]-40]
 			btnRender.pos=[newSize[1]-80, newSize[2]-45]
 			ddlType.pos=[newSize[1]-145, newSize[2]-42]
 		)
@@ -628,19 +655,47 @@ on btnOutput pressed do (
 	)		
 
 on btnRender pressed do (
-	local countCheck = 0
+	local countCheck1 = 0
+	local countCheck2 = 0
 	local re = maxOps.GetCurRenderElementMgr()
 	if (outFolder != undefined) then (
 		
+		--check if material selected
 		for c = 1 to DotNBoxMats1.Items.count do (
 			if (DotNBoxMats1.Items.Item[c-1].Checked == true) do (
-				countCheck += c
+				countCheck1 += c
 				)
 			)
-		if (countCheck == 0) do (
+		if (countCheck1 == 0) do (
 			MessageBox "No Material selected!" title:ProgramName
 			return false
 			)
+		for cc = 1 to DotNBoxMats2.Items.count do (
+			if (DotNBoxMats2.Items.Item[cc-1].Checked == true) do (
+				countCheck2 += cc
+				)
+			)
+		
+		local num3=""
+			case rendTimeType of (
+				1: num3 = ""
+				2: (
+					num1 = l - 1 + animationRange.start + rendFileNumberBase
+					num2 = "000" + num1 as string 
+					num3 = subString num2 (num2.count - 3) 4
+					)
+				3: (
+					num1 = l - 1 + rendStart + rendFileNumberBase 
+					num2 = "000" + num1 as string 
+					num3 = subString num2 (num2.count - 3) 4
+					)
+				4: (
+					num1 = filterstring rendPickupFrames ",- "
+					num2 = "000" + num1[num1.count]
+					num3 = subString num2 (num2.count - 3) 4
+					)
+			)
+			
 		--loop in material list 1	
 		for l = 1 to colPath1.count do (
 			for i = 1 to DotNBoxMats1.Items.count do (
@@ -657,76 +712,114 @@ on btnRender pressed do (
 				)
 			
 			--loop in material list 2
-			for ll = 1 to colPath2.count do (
-				for ii = 1 to DotNBoxMats2.Items.count do (
-					if (DotNBoxMats2.Items.Item[ii-1].Checked == true) do (
-						if (classof colMats[ii] == Blend OR classof colMats[ii] == Shellac OR classof colMats[ii] == TopBottom \
-							OR classof colMats[ii] == doubleSided OR classof colMats[ii] == Shell_Material OR classof colMats[ii] == MultiMaterial \
-							OR classof colMats[ii] == CompositeMaterial) then (
-								MessageBox ("Warning: You have select a \"" + classof colMats[ii] as string + "\" material, this will not process!") title:ProgramName
-								return false
-							) else (
-								processColTex colMats[ii] colPath2[ll]
-								)
-						) --if checked end
-					)
-					
-				try (outNameA = getFilenameFile colPath1[l]) catch (
-					outNameAT = filterstring (colPath1[l] as string) " ()"
-					outNameA = outNameAT[1]+"_"+outNameAT[2]+"-"+outNameAT[3]+"-"+outNameAT[4]
-					)
-				try (outNameB = getFilenameFile colPath2[ll]) catch (
-					outNameBT = filterstring (colPath2[ll] as string) " ()"
-					outNameB = outNameBT[1]+"_"+outNameBT[2]+"-"+outNameBT[3]+"-"+outNameBT[4]
-					)	
-
-				if (chkMakeF.checked == true) then (
-					makeDir (outFolder + "\\" + outNameA + "_-_" + outNameB) all:false
-					outF = (outFolder + "\\" + outNameA + "_-_" + outNameB + "\\" + outNameA + "_-_" + outNameB)
-					) else (
-						outF = (outFolder + "\\" + outNameA + "_-_" + outNameB)						
+			if (countCheck2 != 0) then (
+				for ll = 1 to colPath2.count do (
+					for ii = 1 to DotNBoxMats2.Items.count do (
+						if (DotNBoxMats2.Items.Item[ii-1].Checked == true) do (
+							if (classof colMats[ii] == Blend OR classof colMats[ii] == Shellac OR classof colMats[ii] == TopBottom \
+								OR classof colMats[ii] == doubleSided OR classof colMats[ii] == Shell_Material OR classof colMats[ii] == MultiMaterial \
+								OR classof colMats[ii] == CompositeMaterial) then (
+									MessageBox ("Warning: You have select a \"" + classof colMats[ii] as string + "\" material, this will not process!") title:ProgramName
+									return false
+								) else (
+									processColTex colMats[ii] colPath2[ll]
+									)
+							) --if checked end
 						)
-				-- render
-				renderSceneDialog.close()
-				for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
-				rendShowVFB = on
-				rendSaveFile = on
-				rendSaveFile = on
-				rendOutputFilename = (outF + "_" + ddlType.items[ddlType.selection])
-				renderSceneDialog.commit()
-				max quick render
+						
+					--render inc. mat loop 2	
+					try (outNameA = getFilenameFile colPath1[l]) catch (
+						outNameAT = filterstring (colPath1[l] as string) " ()"
+						outNameA = outNameAT[1]+"_"+outNameAT[2]+"-"+outNameAT[3]+"-"+outNameAT[4]
+						)
+					try (outNameB = getFilenameFile colPath2[ll]) catch (
+						outNameBT = filterstring (colPath2[ll] as string) " ()"
+						outNameB = outNameBT[1]+"_"+outNameBT[2]+"-"+outNameBT[3]+"-"+outNameBT[4]
+						)	
 
-				local num3=""
-					case rendTimeType of (
-						1: num3 = ""
-						2: (
-							num1 = l - 1 + animationRange.start + rendFileNumberBase
-							num2 = "000" + num1 as string 
-							num3 = subString num2 (num2.count - 3) 4
+					if (chkMakeF.checked == true) then (
+						makeDir (outFolder + "\\" + outNameA + "_-_" + outNameB) all:false
+						outF = (outFolder + "\\" + outNameA + "_-_" + outNameB + "\\" + outNameA + "_-_" + outNameB)
+						) else (
+							outF = (outFolder + "\\" + outNameA + "_-_" + outNameB)						
 							)
-						3: (
-							num1 = l - 1 + rendStart + rendFileNumberBase 
-							num2 = "000" + num1 as string 
-							num3 = subString num2 (num2.count - 3) 4
-							)
-						4: (
-							num1 = filterstring rendPickupFrames ",- "
-							num2 = "000" + num1[num1.count]
-							num3 = subString num2 (num2.count - 3) 4
-							)
-					)
-
-				if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do (
-					for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
-					rendOutputFilename = ""
-					renderSceneDialog.commit()
-					return false
-					)
 					
-				) --loop in material list 1 end
-				
-			
-			)
+					if (chkNetR.checked == true) then (
+						--send to fn NetRender
+						renderSceneDialog.close()
+						for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
+						rendSaveFile = on
+						rendOutputFilename = (outF + "_" + ddlType.items[ddlType.selection])
+						renderSceneDialog.commit()
+						saveName = (maxFilePath + "\\" + outNameA + "_-_" + outNameB + ".max")
+						saveMaxFile saveName
+						m = netrender.getmanager()
+						m.connect #automatic "255.255.255.0"
+
+						job = m.newjob file:saveName
+						job.includeMaps = true
+						job.submit()
+						m.disconnect
+					) else (
+						--send to fn BRender
+						BRender re outF ddlType.items[ddlType.selection]
+						
+						--check if file exist	
+						if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do (
+							for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
+							rendOutputFilename = ""
+							renderSceneDialog.commit()
+							return false
+							)						
+						)
+						prgProgress2.value = 100.000 / colPath2.count * ll
+					) --loop in material list 2 end
+				) else (
+					--render mat loop 1 only 
+					try (outNameA = getFilenameFile colPath1[l]) catch (
+						outNameAT = filterstring (colPath1[l] as string) " ()"
+						outNameA = outNameAT[1]+"_"+outNameAT[2]+"-"+outNameAT[3]+"-"+outNameAT[4]
+						)	
+
+					if (chkMakeF.checked == true) then (
+						makeDir (outFolder + "\\" + outNameA) all:false
+						outF = (outFolder + "\\" + outNameA + "\\" + outNameA)
+						) else (
+							outF = (outFolder + "\\" + outNameA)						
+							)
+							
+					if (chkNetR.checked == true) then (
+						--send to fn NetRender
+						renderSceneDialog.close()
+						for r1 = 0 to re.numrenderelements() do re.SetRenderElementFilename r1 ""
+						rendSaveFile = on
+						rendOutputFilename = (outF + "_" + ddlType.items[ddlType.selection])
+						renderSceneDialog.commit()
+						saveName = (maxFilePath + "\\" + outNameA + ".max")
+						saveMaxFile saveName
+						m = netrender.getmanager()
+						m.connect #automatic "255.255.255.0"
+
+						job = m.newjob file:saveName
+						job.includeMaps = true
+						job.submit()
+						m.disconnect
+					) else (
+						--send to fn BRender
+						BRender re outF ddlType.items[ddlType.selection]
+						
+						--check if file exist	
+						if (openBitMap (outF + "_"+ num3 + ddlType.items[ddlType.selection]) == undefined) do (
+							for r2 = 0 to re.numrenderelements() do re.SetRenderElementFilename r2 ""
+							rendOutputFilename = ""
+							renderSceneDialog.commit()
+							return false
+							)
+						)	
+					)
+				prgProgress1.value = 100.000 / colPath1.count * l
+					
+			) --loop in material list 1 end
 			for r3 = 0 to re.numrenderelements() do re.SetRenderElementFilename r3 ""
 			rendOutputFilename = ""
 			renderSceneDialog.commit()
