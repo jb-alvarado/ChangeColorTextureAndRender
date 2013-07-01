@@ -17,6 +17,15 @@ ChangeColorTextureAndRender
 
 ![Change Color Texture And Render](http://www.pixelcrusher.de/files/ChangeColoTextureAndRender.PNG "ChangeColorTextureAndRender")
 
+
+
+ChangeColorTextureAndRender
+=========
+
+
+![Multi Change Color Texture And Render](http://www.pixelcrusher.de/files/MultiChangeColorTextureAndRender.png "MultiChangeColorTextureAndRender")
+
+
 Download
 --------
 
